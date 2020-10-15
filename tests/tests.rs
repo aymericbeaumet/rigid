@@ -11,6 +11,3 @@ fn it_should_match_serde_output() {
         assert_eq!(output, serde_output);
     }
 }
-
-// TODO(test): do we want to detect duplicates?
-// TODO(test): do we want to detect missing fields?
