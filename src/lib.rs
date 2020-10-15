@@ -13,6 +13,7 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
     };
 
     let mut steps = vec![];
+    let mut ret = vec![];
 
     steps.push(quote::quote! {
         idx += eat_whitespaces(&bytes[idx..])?;
@@ -24,6 +25,11 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
     for (i, field) in fields.iter().enumerate() {
         if let Some(ident) = &field.ident {
             let ident_string = ident.to_string();
+
+            ret.push(quote::quote! {
+                #ident: #ident
+            });
+
             steps.push(quote::quote! {
                 let (delta, #ident) = eat_object_key_value(
                     &bytes[idx..],
@@ -56,7 +62,9 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
                 #(#steps)*
 
                 if idx == s.len() {
-                    Ok(#typename { age: age, height: height })
+                    Ok(#typename {
+                        #(#ret),*
+                    })
                 } else {
                     Err(format!(r#"from_json_str found trailing characters that cannot be parsed: "{}""#, &s[idx..]))
                 }
