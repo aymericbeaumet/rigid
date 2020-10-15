@@ -15,7 +15,6 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
     let mut steps = vec![];
 
     steps.push(quote::quote! {
-                idx += eat_whitespaces(&bytes[idx..])?;
                 idx += eat_char(&bytes[idx..], b'{')?;
                 idx += eat_whitespaces(&bytes[idx..])?;
     });
@@ -28,7 +27,6 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
     steps.push(quote::quote! {
                 idx += eat_whitespaces(&bytes[idx..])?;
                 idx += eat_char(&bytes[idx..], b'}')?;
-                idx += eat_whitespaces(&bytes[idx..])?;
     });
 
     let from_json_str_impl = quote::quote! {
@@ -37,7 +35,11 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
                 let bytes = s.as_bytes();
                 let mut idx = 0;
 
+                idx += eat_whitespaces(&bytes[idx..])?;
+
                 #(#steps)*
+
+                idx += eat_whitespaces(&bytes[idx..])?;
 
                 if idx == s.len() {
                     Ok(#typename { age: age })
