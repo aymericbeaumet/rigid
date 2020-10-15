@@ -10,7 +10,7 @@ static data: &str = r#"{ "age": 43 }"#;
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("rigid", |b| {
         b.iter(|| {
-            Person::json_from_str(black_box(data)).unwrap();
+            Person::from_json_str(black_box(data)).unwrap();
         })
     });
     c.bench_function("serde", |b| {

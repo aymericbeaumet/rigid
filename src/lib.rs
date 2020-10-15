@@ -11,7 +11,7 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
     };
     let typename = input.ident;
 
-    let json_from_str_impl = quote::quote! {
+    let from_json_str_impl = quote::quote! {
         fn eat_whitespaces(bytes: &[u8]) -> Result<usize, ()> {
             let mut idx = 0;
             while idx < bytes.len() && bytes[idx] == b' ' {
@@ -72,7 +72,7 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
         }
 
         impl #typename {
-            fn json_from_str(s: &str) -> Result<#typename, ()> {
+            fn from_json_str(s: &str) -> Result<#typename, ()> {
                 let bytes = s.as_bytes();
                 let mut idx = 0;
 
@@ -96,5 +96,5 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
         }
     };
 
-    TokenStream::from(json_from_str_impl)
+    TokenStream::from(from_json_str_impl)
 }
