@@ -7,17 +7,17 @@ struct Person {
 
 static data: &str = r#"{ "age": 43 }"#;
 
-fn rigid(n: u64) -> Person {
-    Person::json_from_str(data).unwrap()
-}
-
-fn serde(n: u64) -> Person {
-    serde_json::from_str(data).unwrap()
-}
-
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("rigid", |b| b.iter(|| rigid(black_box(20))));
-    c.bench_function("serde", |b| b.iter(|| serde(black_box(20))));
+    c.bench_function("rigid", |b| {
+        b.iter(|| {
+            Person::json_from_str(black_box(data)).unwrap();
+        })
+    });
+    c.bench_function("serde", |b| {
+        b.iter(|| {
+            serde_json::from_str::<Person>(black_box(data)).unwrap();
+        })
+    });
 }
 
 criterion_group!(benches, criterion_benchmark);
