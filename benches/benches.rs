@@ -10,7 +10,7 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     let mut speed = c.benchmark_group("speed");
 
-    speed.bench_function("blackbox", |b| {
+    speed.bench_function("baseline", |b| {
         b.iter(|| {
             black_box(black_box(data));
         })
