@@ -7,7 +7,7 @@ publish = false
 
 [[bin]]
 name = "dummy"
-path = "dummy.rs"
+path = ".dummy.rs"
 
 [dependencies]
 criterion = "0.3.3"
