@@ -55,7 +55,7 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
 
     let from_json_str_impl = quote::quote! {
         impl #typename {
-            fn from_json_str(s: &str) -> Result<#typename, String> {
+            fn from_json_str(s: &str) -> Result<#typename, ::rigid_runtime::Error> {
                 let bytes = s.as_bytes();
                 let mut idx = 0;
 
@@ -66,7 +66,7 @@ pub fn derive_json_parser(input: TokenStream) -> TokenStream {
                         #(#ret),*
                     })
                 } else {
-                    Err(format!(r#"from_json_str found trailing characters that cannot be parsed: "{}""#, &s[idx..]))
+                    Err(format!(r#"from_json_str found trailing characters that cannot be parsed: "{}""#, &s[idx..]).into())
                 }
             }
         }
