@@ -14,9 +14,9 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
     let mut ret = vec![];
 
     steps.push(quote::quote! {
-        idx += ::rigid::runtime::eat_whitespaces(&bytes[idx..])?;
+        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
         idx += ::rigid::runtime::eat_char(&bytes[idx..], b'{')?;
-        idx += ::rigid::runtime::eat_whitespaces(&bytes[idx..])?;
+        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
     });
 
     let fields: Vec<_> = data.fields.iter().collect();
@@ -27,7 +27,7 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
             let field_type = &field.ty;
             let parsing_method = quote::format_ident!(
                 "eat_object_key_value_{}",
-                quote::quote! {#field_type}.to_string()
+                quote::quote! {#field_type}.to_string().to_ascii_lowercase(),
             );
 
             ret.push(quote::quote! {
@@ -44,18 +44,18 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
 
             if i < fields.len() - 1 {
                 steps.push(quote::quote! {
-                    idx += ::rigid::runtime::eat_whitespaces(&bytes[idx..])?;
+                    idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
                     idx += ::rigid::runtime::eat_char(&bytes[idx..], b',')?;
-                    idx += ::rigid::runtime::eat_whitespaces(&bytes[idx..])?;
+                    idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
                 });
             }
         }
     }
 
     steps.push(quote::quote! {
-        idx += ::rigid::runtime::eat_whitespaces(&bytes[idx..])?;
+        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
         idx += ::rigid::runtime::eat_char(&bytes[idx..], b'}')?;
-        idx += ::rigid::runtime::eat_whitespaces(&bytes[idx..])?;
+        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
     });
 
     let from_json_impl = quote::quote! {

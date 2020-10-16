@@ -32,13 +32,15 @@ fn it_should_match_serde_output_for_struct_one_field() {
 struct Person {
     height: u8,
     birth_year: u16,
+    name: String,
+    alive: bool,
 }
 
 #[test]
 fn it_should_match_serde_output_for_struct_person() {
     for input in &[
-        r#"{"height":187,"birth_year": 1992}"#,
-        r#" { "height": 187 , "birth_year": 1992 } "#,
+        r#"{"height":187,"birth_year":1992,"name":"aymeric","alive":true}"#,
+        r#" { "height": 187 , "birth_year": 1992 , "name": "aymeric" , "alive" : true } "#,
     ] {
         let serde_output: Person = serde_json::from_str(input)
             .unwrap_or_else(|err| panic!("serde failed to parse `{}` with error {}", input, err));
