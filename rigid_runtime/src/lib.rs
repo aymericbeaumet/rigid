@@ -1,7 +1,7 @@
 pub struct Error(String);
 
 #[inline]
-pub fn eat_whitespaces(bytes: &[u8]) -> Result<usize, String> {
+pub const fn eat_whitespaces(bytes: &[u8]) -> Result<usize, String> {
     let mut idx = 0;
     while idx < bytes.len() && bytes[idx] == b' ' {
         idx += 1;
@@ -11,7 +11,7 @@ pub fn eat_whitespaces(bytes: &[u8]) -> Result<usize, String> {
 
 #[inline]
 pub fn eat_char(bytes: &[u8], c: u8) -> Result<usize, String> {
-    if bytes.len() >= 1 && bytes[0] == c {
+    if !bytes.is_empty() && bytes[0] == c {
         Ok(1)
     } else {
         Err(format!(
