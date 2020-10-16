@@ -1,0 +1,10 @@
+[package]
+name = "hello_world"
+version = "0.0.0"
+authors = ["Aymeric Beaumet <hi@aymericbeaumet.com>"]
+edition = "2018"
+publish = false
+
+[dependencies]
+rigid = { path = "../../rigid" }
+rigid_runtime = { path = "../../rigid_runtime" }
