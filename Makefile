@@ -1,12 +1,12 @@
 .PHONY: all
-all: clean build ci
+all: clean build ci bench
 
 .PHONY: build
 build:
 	cargo build
 
 .PHONY: ci
-ci: lint test bench
+ci: lint test
 
 .PHONY: lint
 lint:
@@ -19,7 +19,7 @@ lint:
 
 .PHONY: test
 test:
-	cargo test
+	cargo test --benches
 
 .PHONY: bench
 bench:
