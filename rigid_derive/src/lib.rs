@@ -7,9 +7,7 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
 
     let data = match input.data {
         syn::Data::Struct(s) => s,
-        _ => {
-            return TokenStream::default();
-        }
+        _ => unimplemented!("Only structs are supported at the moment."),
     };
 
     let mut steps = vec![];
