@@ -7,4 +7,3 @@ publish = false
 
 [dependencies]
 rigid = { path = "../../rigid" }
-rigid_runtime = { path = "../../rigid_runtime" }

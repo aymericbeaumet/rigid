@@ -1,9 +1,13 @@
 [package]
-name = "rigid"
+name = "rigid_derive"
 version = "0.1.0"
 authors = ["Aymeric Beaumet <hi@aymericbeaumet.com>"]
 edition = "2018"
 
+[lib]
+proc-macro = true
+
 [dependencies]
-rigid_derive = { path = "../rigid_derive" }
+quote = "1.0.7"
 rigid_runtime = { path = "../rigid_runtime" }
+syn = "1.0.44"

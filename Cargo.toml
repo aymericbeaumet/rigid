@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "rigid",
+  "rigid_derive",
   "rigid_runtime",
 
   "benches",
