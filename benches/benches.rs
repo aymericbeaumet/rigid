@@ -2,19 +2,23 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 #[derive(Debug, PartialEq, serde::Deserialize, rigid::FromJSON)]
 struct Person {
-    age: u8,
+    height: u8,
+    birth_year: u16,
+    name: String,
+    alive: bool,
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
-    let data: &str = r#"{ "age": 43 }"#;
+    let data: &str =
+        r#" { "height": 187 , "birth_year": 1992 , "name": "aymeric" , "alive" : true } "#;
 
     let mut speed = c.benchmark_group("speed");
 
-    speed.bench_function("baseline", |b| {
-        b.iter(|| {
-            black_box(black_box(data));
-        })
-    });
+    //speed.bench_function("baseline", |b| {
+    //b.iter(|| {
+    //black_box(black_box(data));
+    //})
+    //});
 
     speed.bench_function("rigid::from_json", |b| {
         b.iter(|| {
@@ -28,32 +32,32 @@ fn criterion_benchmark(c: &mut Criterion) {
         })
     });
 
-    speed.bench_function("json::parse", |b| {
-        b.iter(|| {
-            black_box(json::parse(black_box(data)).unwrap());
-        })
-    });
+    //speed.bench_function("json::parse", |b| {
+    //b.iter(|| {
+    //black_box(json::parse(black_box(data)).unwrap());
+    //})
+    //});
 
-    speed.bench_function("simd_json::serde::from_slice", |b| {
-        let mut data_mut = data.as_bytes().to_vec();
-        b.iter(|| {
-            black_box(simd_json::serde::from_slice::<Person>(black_box(&mut data_mut)).unwrap());
-        })
-    });
+    //speed.bench_function("simd_json::serde::from_slice", |b| {
+    //let mut data_mut = data.as_bytes().to_vec();
+    //b.iter(|| {
+    //black_box(simd_json::serde::from_slice::<Person>(black_box(&mut data_mut)).unwrap());
+    //})
+    //});
 
-    speed.bench_function("simd_json::to_borrowed_value", |b| {
-        let mut data_mut = data.as_bytes().to_vec();
-        b.iter(|| {
-            black_box(simd_json::to_borrowed_value(black_box(&mut data_mut)).unwrap());
-        })
-    });
+    //speed.bench_function("simd_json::to_borrowed_value", |b| {
+    //let mut data_mut = data.as_bytes().to_vec();
+    //b.iter(|| {
+    //black_box(simd_json::to_borrowed_value(black_box(&mut data_mut)).unwrap());
+    //})
+    //});
 
-    speed.bench_function("simd_json::to_owned_value", |b| {
-        let mut data_mut = data.as_bytes().to_vec();
-        b.iter(|| {
-            black_box(simd_json::to_owned_value(black_box(&mut data_mut)).unwrap());
-        })
-    });
+    //speed.bench_function("simd_json::to_owned_value", |b| {
+    //let mut data_mut = data.as_bytes().to_vec();
+    //b.iter(|| {
+    //black_box(simd_json::to_owned_value(black_box(&mut data_mut)).unwrap());
+    //})
+    //});
 
     speed.finish();
 }
