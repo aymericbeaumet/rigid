@@ -5,17 +5,17 @@ struct Person {
     age: u8,
 }
 
-static data: &str = r#"{ "age": 43 }"#;
+static DATA: &str = r#"{ "age": 43 }"#;
 
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("rigid", |b| {
         b.iter(|| {
-            Person::from_json_str(black_box(data)).unwrap();
+            Person::from_json_str(black_box(DATA)).unwrap();
         })
     });
     c.bench_function("serde", |b| {
         b.iter(|| {
-            serde_json::from_str::<Person>(black_box(data)).unwrap();
+            serde_json::from_str::<Person>(black_box(DATA)).unwrap();
         })
     });
 }
