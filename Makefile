@@ -1,5 +1,9 @@
 .PHONY: all
-all:
+all: clean build ci
+
+.PHONY: build
+build:
+	cargo build
 
 .PHONY: ci
 ci: lint test bench
