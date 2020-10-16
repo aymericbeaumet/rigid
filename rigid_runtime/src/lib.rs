@@ -102,7 +102,7 @@ pub fn eat_number_u16(bytes: &[u8]) -> Result<(usize, u16)> {
     let mut idx = 0;
     let mut out = 0;
     while idx < bytes.len() && bytes[idx] >= b'0' && bytes[idx] <= b'9' {
-        out = out * 10 + (bytes[idx] - b'0') as u16;
+        out = out * 10 + u16::from(bytes[idx] - b'0');
         idx += 1;
     }
     if idx > 0 {
