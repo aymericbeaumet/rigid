@@ -1,6 +1,29 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 #[derive(Debug, PartialEq, serde::Deserialize, rigid::FromJSON)]
+struct StructEmpty {}
+
+fn criterion_struct_empty_many_spaces(c: &mut Criterion) {
+    let data: &str = r#"          {          }          "#;
+
+    let mut speed = c.benchmark_group("empty_many_spaces");
+
+    speed.bench_function("rigid::from_json", |b| {
+        b.iter(|| {
+            black_box(StructEmpty::from_json(black_box(data)).unwrap());
+        })
+    });
+
+    speed.bench_function("serde_json::from_str", |b| {
+        b.iter(|| {
+            black_box(serde_json::from_str::<StructEmpty>(black_box(data)).unwrap());
+        })
+    });
+
+    speed.finish();
+}
+
+#[derive(Debug, PartialEq, serde::Deserialize, rigid::FromJSON)]
 struct StructBool {
     height: bool,
 }
@@ -131,6 +154,7 @@ fn criterion_person(c: &mut Criterion) {
 
 criterion_group!(
     benches,
+    criterion_struct_empty_many_spaces,
     criterion_struct_bool,
     criterion_struct_u8,
     criterion_struct_u16,
