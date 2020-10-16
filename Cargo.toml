@@ -2,4 +2,5 @@
 members = [
     "rigid",
     "rigid_runtime",
+    "tests",
 ]
