@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "rigid",
-    "rigid_runtime",
-    "tests",
+  "benches",
+  "rigid",
+  "rigid_runtime",
+  "tests",
 ]

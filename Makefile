@@ -10,7 +10,7 @@ ci: lint test bench
 
 .PHONY: lint
 lint:
-	cargo clippy --all-targets -- \
+	cargo clippy -- \
 		-W clippy::cargo \
 		-W clippy::nursery \
 		-W clippy::pedantic \
@@ -19,11 +19,11 @@ lint:
 
 .PHONY: test
 test:
-	cargo test --all-targets
+	cargo test
 
 .PHONY: bench
 bench:
-	cargo bench --all-targets
+	cargo bench
 
 .PHONY: clean
 clean:
