@@ -2,6 +2,14 @@
 name = "rigid_derive"
 version = "0.1.0"
 authors = ["Aymeric Beaumet <hi@aymericbeaumet.com>"]
+license = "MIT"
+description = "Rigid's derive proc macro"
+homepage = "https://github.com/aymericbeaumet/rigid"
+repository = "https://github.com/aymericbeaumet/rigid"
+documentation = "https://docs.rs/rigid_derive/"
+keywords = ["json", "deserialization"]
+categories = ["encoding"]
+readme = "../readme.md"
 edition = "2018"
 
 [lib]
