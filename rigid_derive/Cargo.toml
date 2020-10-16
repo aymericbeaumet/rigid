@@ -9,5 +9,5 @@ proc-macro = true
 
 [dependencies]
 quote = "1.0.7"
-rigid_runtime = { path = "../rigid_runtime" }
+rigid_runtime = { version = "=0.1.0", path = "../rigid_runtime" }
 syn = "1.0.44"
