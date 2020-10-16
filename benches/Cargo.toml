@@ -13,7 +13,7 @@ path = ".dummy.rs"
 criterion = "0.3.3"
 json = "0.12.4"
 rigid = { path = "../rigid" }
-serde = { version = "1.0.116", features = ["derive"] }
+serde = { version = "1.0.117", features = ["derive"] }
 serde_json = "1.0.59"
 simd-json = "0.3.21"
 
