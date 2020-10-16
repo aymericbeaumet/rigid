@@ -24,12 +24,18 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
         if let Some(ident) = &field.ident {
             let ident_string = ident.to_string();
 
+            let field_type = &field.ty;
+            let parsing_method = quote::format_ident!(
+                "eat_object_key_value_{}",
+                quote::quote! {#field_type}.to_string()
+            );
+
             ret.push(quote::quote! {
                 #ident: #ident
             });
 
             steps.push(quote::quote! {
-                let (delta, #ident) = ::rigid::runtime::eat_object_key_value(
+                let (delta, #ident) = ::rigid::runtime::#parsing_method(
                     &bytes[idx..],
                     #ident_string.as_bytes(),
                 )?;
@@ -38,6 +44,7 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
 
             if i < fields.len() - 1 {
                 steps.push(quote::quote! {
+                    idx += ::rigid::runtime::eat_whitespaces(&bytes[idx..])?;
                     idx += ::rigid::runtime::eat_char(&bytes[idx..], b',')?;
                     idx += ::rigid::runtime::eat_whitespaces(&bytes[idx..])?;
                 });
@@ -53,7 +60,7 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
 
     let from_json_impl = quote::quote! {
         impl #typename {
-            fn from_json(s: &str) -> Result<#typename, ::rigid::runtime::Error> {
+            fn from_json(s: &str) -> Result<#typename, ::rigid::Error> {
                 let bytes = s.as_bytes();
                 let mut idx = 0;
 
@@ -64,7 +71,10 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
                         #(#ret),*
                     })
                 } else {
-                    Err(format!(r#"from_json_str found trailing characters that cannot be parsed: "{}""#, &s[idx..]).into())
+                    Err(::rigid::Error::new(
+                        "from_json_str found trailing characters that cannot be parsed",
+                        &bytes[idx..],
+                    ))
                 }
             }
         }
