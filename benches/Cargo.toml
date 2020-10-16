@@ -10,7 +10,7 @@ name = "dummy"
 path = ".dummy.rs"
 
 [dependencies]
-criterion = "0.3.3"
+criterion = { version = "0.3.3", features = ["real_blackbox"] }
 json = "0.12.4"
 rigid = { path = "../rigid" }
 serde = { version = "1.0.117", features = ["derive"] }
