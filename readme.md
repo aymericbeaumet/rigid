@@ -3,8 +3,10 @@
 ## Development
 
 ```
-cargo test
-cargo bench
+# Lint the code and run the tests
+make lint test
+# Run the benchmarks
+make bench
 ```
 
 ## TODO
