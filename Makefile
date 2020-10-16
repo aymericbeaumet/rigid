@@ -23,7 +23,7 @@ test:
 
 .PHONY: bench
 bench:
-	cargo bench
+	cargo bench --bench benches
 
 .PHONY: clean
 clean:
