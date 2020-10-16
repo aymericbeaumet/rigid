@@ -97,6 +97,7 @@ pub fn eat_number_u8(bytes: &[u8]) -> Result<(usize, u8)> {
     }
 }
 
+#[inline]
 pub fn eat_number_u16(bytes: &[u8]) -> Result<(usize, u16)> {
     let mut idx = 0;
     let mut out = 0;
