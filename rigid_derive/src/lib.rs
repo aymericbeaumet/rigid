@@ -14,7 +14,6 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
     let mut ret = vec![];
 
     steps.push(quote::quote! {
-        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
         idx += ::rigid::runtime::eat_char(&bytes[idx..], b'{')?;
         idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
     });
@@ -40,11 +39,12 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
                     #ident_string.as_bytes(),
                 )?;
                 idx += delta;
+
+                idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
             });
 
             if i < fields.len() - 1 {
                 steps.push(quote::quote! {
-                    idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
                     idx += ::rigid::runtime::eat_char(&bytes[idx..], b',')?;
                     idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
                 });
@@ -53,7 +53,6 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
     }
 
     steps.push(quote::quote! {
-        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
         idx += ::rigid::runtime::eat_char(&bytes[idx..], b'}')?;
         idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
     });
@@ -63,6 +62,9 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
             fn from_json(s: &str) -> Result<#typename, ::rigid::Error> {
                 let bytes = s.as_bytes();
                 let mut idx = 0;
+
+                // make sure we always consume extraneous whitespaces
+                idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
 
                 #(#steps)*
 
