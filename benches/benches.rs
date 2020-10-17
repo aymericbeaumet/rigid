@@ -1,6 +1,9 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 #[derive(Debug, PartialEq, serde::Deserialize, rigid::FromJSON)]
+struct StringOnly(String);
+
+#[derive(Debug, PartialEq, serde::Deserialize, rigid::FromJSON)]
 struct StructEmpty {}
 
 fn criterion_struct_empty_many_spaces(c: &mut Criterion) {

@@ -1,4 +1,18 @@
 #[derive(Debug, PartialEq, serde::Deserialize, rigid::FromJSON)]
+struct TupleString(String);
+
+#[test]
+fn it_should_match_serde_output_for_struct_tuple_string() {
+    for input in &[r#""foobar""#, r#" "foobar" "#] {
+        let serde_output: TupleString = serde_json::from_str(input)
+            .unwrap_or_else(|err| panic!("serde failed to parse `{}` with error {}", input, err));
+        let output = TupleString::from_json(input)
+            .unwrap_or_else(|err| panic!("rigid failed to parse `{}` with error {}", input, err));
+        assert_eq!(output, serde_output, "rigid's and serde's outputs differ");
+    }
+}
+
+#[derive(Debug, PartialEq, serde::Deserialize, rigid::FromJSON)]
 struct Empty {}
 
 #[test]
