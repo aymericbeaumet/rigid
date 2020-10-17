@@ -23,6 +23,7 @@ test:
 
 .PHONY: bench
 bench:
+	@rm -rf benches/target/criterion
 	cargo bench --bench benches
 
 .PHONY: clean
