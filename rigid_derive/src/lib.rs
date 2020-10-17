@@ -84,16 +84,16 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
                         idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
                     });
 
+                    ret_fields.push(quote::quote! {
+                        #ident: #ident
+                    });
+
                     if i < fields.len() - 1 {
                         steps.push(quote::quote! {
                             idx += ::rigid::runtime::eat_char(&bytes[idx..], b',')?;
                             idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
                         });
                     }
-
-                    ret_fields.push(quote::quote! {
-                        #ident: #ident
-                    });
                 }
                 _ => unimplemented!("Tuple struct with multiple fields are not supported."),
             }
