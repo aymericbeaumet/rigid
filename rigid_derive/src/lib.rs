@@ -43,8 +43,10 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
     // Parse into tuple struct with one field
 
     if fields.len() == 1 && fields[0].ident.is_none() {
+        let eat_fn = get_eat_fn(&fields[0].ty);
+
         steps.push(quote::quote! {
-            let(delta, out) = ::rigid::runtime::eat_string(&bytes[idx..])?;
+            let(delta, out) = ::rigid::runtime::#eat_fn(&bytes[idx..])?;
             idx += delta;
 
             let ret = #typename(out);
@@ -66,23 +68,17 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
         for (i, field) in fields.iter().enumerate() {
             match &field.ident {
                 Some(ident) => {
-                    ret_fields.push(quote::quote! {
-                        #ident: #ident
-                    });
-
+                    let eat_fn = get_eat_fn(&field.ty);
                     let ident_string = ident.to_string();
 
-                    let field_type = &field.ty;
-                    let parsing_method = quote::format_ident!(
-                        "eat_object_key_value_{}",
-                        quote::quote! {#field_type}.to_string().to_ascii_lowercase(),
-                    );
-
                     steps.push(quote::quote! {
-                        let (delta, #ident) = ::rigid::runtime::#parsing_method(
-                            &bytes[idx..],
-                            #ident_string.as_bytes(),
-                        )?;
+                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+                        idx += ::rigid::runtime::eat_object_key(&bytes[idx..], #ident_string.as_bytes())?;
+                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+                        idx += ::rigid::runtime::eat_char(&bytes[idx..], b':')?;
+                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+
+                        let (delta, #ident) = ::rigid::runtime::#eat_fn(&bytes[idx..])?;
                         idx += delta;
 
                         idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
@@ -94,6 +90,10 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
                             idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
                         });
                     }
+
+                    ret_fields.push(quote::quote! {
+                        #ident: #ident
+                    });
                 }
                 _ => unimplemented!("Tuple struct with multiple fields are not supported."),
             }
@@ -111,4 +111,11 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
 
         return steps;
     }
+}
+
+fn get_eat_fn(ty: &syn::Type) -> syn::Ident {
+    quote::format_ident!(
+        "eat_{}",
+        quote::quote! {#ty}.to_string().to_ascii_lowercase(),
+    )
 }

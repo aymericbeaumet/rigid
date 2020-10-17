@@ -46,72 +46,7 @@ pub fn eat_char(bytes: &[u8], c: u8) -> Result<usize> {
 }
 
 #[inline]
-pub fn eat_object_key_value_u8(bytes: &[u8], k: &[u8]) -> Result<(usize, u8)> {
-    let mut idx = 0;
-    idx += eat_object_key(&bytes[idx..], k)?;
-    idx += skip_whitespaces(&bytes[idx..])?;
-    idx += eat_char(&bytes[idx..], b':')?;
-    idx += skip_whitespaces(&bytes[idx..])?;
-
-    let (delta, value) = eat_number_u8(&bytes[idx..])?;
-    idx += delta;
-
-    Ok((idx, value))
-}
-
-#[inline]
-pub fn eat_object_key_value_u16(bytes: &[u8], k: &[u8]) -> Result<(usize, u16)> {
-    let mut idx = 0;
-    idx += eat_object_key(&bytes[idx..], k)?;
-    idx += skip_whitespaces(&bytes[idx..])?;
-    idx += eat_char(&bytes[idx..], b':')?;
-    idx += skip_whitespaces(&bytes[idx..])?;
-
-    let (delta, value) = eat_number_u16(&bytes[idx..])?;
-    idx += delta;
-
-    Ok((idx, value))
-}
-
-#[inline]
-pub fn eat_object_key_value_string(bytes: &[u8], k: &[u8]) -> Result<(usize, String)> {
-    let mut idx = 0;
-    idx += eat_object_key(&bytes[idx..], k)?;
-    idx += skip_whitespaces(&bytes[idx..])?;
-    idx += eat_char(&bytes[idx..], b':')?;
-    idx += skip_whitespaces(&bytes[idx..])?;
-
-    let (delta, value) = eat_string(&bytes[idx..])?;
-    idx += delta;
-
-    Ok((idx, value))
-}
-
-#[inline]
-pub fn eat_object_key_value_bool(bytes: &[u8], k: &[u8]) -> Result<(usize, bool)> {
-    let mut idx = 0;
-    idx += eat_object_key(&bytes[idx..], k)?;
-    idx += skip_whitespaces(&bytes[idx..])?;
-    idx += eat_char(&bytes[idx..], b':')?;
-    idx += skip_whitespaces(&bytes[idx..])?;
-
-    let (delta, value) = eat_bool(&bytes[idx..])?;
-    idx += delta;
-
-    Ok((idx, value))
-}
-
-#[inline]
-pub fn eat_object_key(bytes: &[u8], k: &[u8]) -> Result<usize> {
-    let mut idx = 0;
-    idx += eat_char(&bytes[idx..], b'"')?;
-    idx += eat_slice(&bytes[idx..], k)?;
-    idx += eat_char(&bytes[idx..], b'"')?;
-    Ok(idx)
-}
-
-#[inline]
-pub fn eat_number_u8(bytes: &[u8]) -> Result<(usize, u8)> {
+pub fn eat_u8(bytes: &[u8]) -> Result<(usize, u8)> {
     let mut idx = 0;
     let mut out = 0;
     while idx < bytes.len() && bytes[idx] >= b'0' && bytes[idx] <= b'9' {
@@ -126,7 +61,7 @@ pub fn eat_number_u8(bytes: &[u8]) -> Result<(usize, u8)> {
 }
 
 #[inline]
-pub fn eat_number_u16(bytes: &[u8]) -> Result<(usize, u16)> {
+pub fn eat_u16(bytes: &[u8]) -> Result<(usize, u16)> {
     let mut idx = 0;
     let mut out = 0;
     while idx < bytes.len() && bytes[idx] >= b'0' && bytes[idx] <= b'9' {
@@ -141,49 +76,18 @@ pub fn eat_number_u16(bytes: &[u8]) -> Result<(usize, u16)> {
 }
 
 #[inline]
-pub fn eat_slice(bytes: &[u8], s: &[u8]) -> Result<usize> {
-    if bytes.starts_with(s) {
-        Ok(s.len())
-    } else {
-        Err(Error::new(
-            format!(
-                "eat_slice could not match {:?} as a prefix of {:?}",
-                s, bytes
-            ),
-            bytes,
-        ))
-    }
-}
-
-#[inline]
 pub fn eat_string(bytes: &[u8]) -> Result<(usize, String)> {
     let mut idx = 0;
     idx += skip_whitespaces(&bytes[idx..])?;
     idx += eat_char(&bytes[idx..], b'"')?;
 
-    let (delta, found) = eat_until_char(&bytes[idx..], b'"')?;
+    let (delta, found) = eat_u8_slice_until_char(&bytes[idx..], b'"')?;
     idx += delta;
 
     idx += eat_char(&bytes[idx..], b'"')?;
     idx += skip_whitespaces(&bytes[idx..])?;
 
     Ok((idx, std::str::from_utf8(found).unwrap().to_string()))
-}
-
-#[inline]
-pub fn eat_until_char(bytes: &[u8], c: u8) -> Result<(usize, &[u8])> {
-    let mut idx = 0;
-    while idx < bytes.len() && bytes[idx] != c {
-        idx += 1;
-    }
-    if idx > 0 {
-        Ok((idx, &bytes[0..idx]))
-    } else {
-        Err(Error::new(
-            format!("eat_until_char could not find {:?}", c),
-            &bytes[idx..],
-        ))
-    }
 }
 
 #[inline]
@@ -202,4 +106,44 @@ pub fn eat_bool(bytes: &[u8]) -> Result<(usize, bool)> {
 
     idx += skip_whitespaces(&bytes[idx..])?;
     Ok((idx, out))
+}
+
+#[inline]
+pub fn eat_u8_slice(bytes: &[u8], s: &[u8]) -> Result<usize> {
+    if bytes.starts_with(s) {
+        Ok(s.len())
+    } else {
+        Err(Error::new(
+            format!(
+                "eat_u8_slice could not match {:?} as a prefix of {:?}",
+                s, bytes
+            ),
+            bytes,
+        ))
+    }
+}
+
+#[inline]
+pub fn eat_u8_slice_until_char(bytes: &[u8], c: u8) -> Result<(usize, &[u8])> {
+    let mut idx = 0;
+    while idx < bytes.len() && bytes[idx] != c {
+        idx += 1;
+    }
+    if idx > 0 {
+        Ok((idx, &bytes[0..idx]))
+    } else {
+        Err(Error::new(
+            format!("eat_until_char could not find {:?}", c),
+            &bytes[idx..],
+        ))
+    }
+}
+
+#[inline]
+pub fn eat_object_key(bytes: &[u8], k: &[u8]) -> Result<usize> {
+    let mut idx = 0;
+    idx += eat_char(&bytes[idx..], b'"')?;
+    idx += eat_u8_slice(&bytes[idx..], k)?;
+    idx += eat_char(&bytes[idx..], b'"')?;
+    Ok(idx)
 }
