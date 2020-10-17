@@ -6,7 +6,7 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
     let typename = &input.ident;
     let steps = get_steps(&input, &typename);
 
-    let from_json_impl = quote::quote! {
+    TokenStream::from(quote::quote! {
         impl #typename {
             fn from_json(s: &str) -> Result<#typename, ::rigid::Error> {
                 let bytes = s.as_bytes();
@@ -28,9 +28,7 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
                 }
             }
         }
-    };
-
-    TokenStream::from(from_json_impl)
+    })
 }
 
 fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export::TokenStream2> {
