@@ -12,6 +12,14 @@ fn it_should_match_serde_output_for_struct_tuple_string() {
     }
 }
 
+#[test]
+fn it_should_support_all_forms_of_whitespaces() {
+    let input = " \x0A\x0D\x09\"foobar\"";
+    let output = TupleString::from_json(input)
+        .unwrap_or_else(|err| panic!("rigid failed to parse `{}` with error {}", input, err));
+    assert_eq!(output, TupleString(String::from("foobar")));
+}
+
 #[derive(Debug, PartialEq, serde::Deserialize, rigid::FromJSON)]
 struct Empty {}
 

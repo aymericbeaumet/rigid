@@ -24,8 +24,14 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[inline]
 pub const fn skip_whitespaces(bytes: &[u8]) -> Result<usize> {
     let mut idx = 0;
-    while idx < bytes.len() && bytes[idx] == b' ' {
-        idx += 1;
+    while idx < bytes.len() {
+        let b = bytes[idx];
+        // space || linefeed || carriage return || horizontal tab
+        if b == b' ' || b == 0x0A || b == 0x0D || b == 0x09 {
+            idx += 1;
+        } else {
+            break;
+        }
     }
     Ok(idx)
 }
