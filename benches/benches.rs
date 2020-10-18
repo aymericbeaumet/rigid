@@ -1,5 +1,25 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion, SamplingMode, Throughput};
 
+fn criterion_eat_bool(c: &mut Criterion) {
+    let bytes = "true".as_bytes();
+
+    let mut eat_bool = c.benchmark_group("eat_bool");
+    eat_bool
+        .sampling_mode(SamplingMode::Linear) // for faster benchmarks (ps/ns/us/ms scale)
+        .warm_up_time(std::time::Duration::new(5, 0))
+        .measurement_time(std::time::Duration::new(10, 0))
+        .sample_size(1000)
+        .throughput(Throughput::Bytes(bytes.len() as u64));
+
+    eat_bool.bench_function("eat_bool", |b| {
+        b.iter(|| {
+            black_box(rigid::runtime::eat_bool(black_box(bytes)).unwrap());
+        })
+    });
+
+    eat_bool.finish();
+}
+
 fn criterion_skip_whitespaces(c: &mut Criterion) {
     let bytes = [b' '; 1024];
 
@@ -197,6 +217,7 @@ fn criterion_person(c: &mut Criterion) {
 
 criterion_group!(
     benches,
+    criterion_eat_bool,
     criterion_skip_whitespaces,
     criterion_struct_one_field_tuple,
     criterion_struct_empty_many_spaces,

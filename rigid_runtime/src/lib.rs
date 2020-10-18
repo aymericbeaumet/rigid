@@ -92,20 +92,25 @@ pub fn eat_string(bytes: &[u8]) -> Result<(usize, String)> {
 
 #[inline]
 pub fn eat_bool(bytes: &[u8]) -> Result<(usize, bool)> {
-    let mut idx = 0;
-    idx += skip_whitespaces(&bytes[idx..]);
+    let len = bytes.len();
 
-    let (delta, out) = if bytes.starts_with(&[b't', b'r', b'u', b'e']) {
-        (4, true)
-    } else if bytes.starts_with(&[b'f', b'a', b'l', b's', b'e']) {
-        (5, false)
-    } else {
-        return Err(Error::new("eat_bool cannot find a boolean", &bytes[idx..]));
-    };
-    idx += delta;
+    if len >= 4 {
+        if bytes[0] == b't' && bytes[1] == b'r' && bytes[2] == b'u' && bytes[3] == b'e' {
+            return Ok((4, true));
+        }
 
-    idx += skip_whitespaces(&bytes[idx..]);
-    Ok((idx, out))
+        if len >= 5
+            && bytes[0] == b'f'
+            && bytes[1] == b'a'
+            && bytes[2] == b'l'
+            && bytes[3] == b's'
+            && bytes[4] == b'e'
+        {
+            return Ok((5, false));
+        }
+    }
+
+    Err(Error::new("eat_bool cannot find a boolean", bytes))
 }
 
 #[inline]
