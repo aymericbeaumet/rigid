@@ -5,11 +5,7 @@ authors = ["Aymeric Beaumet <hi@aymericbeaumet.com>"]
 edition = "2018"
 publish = false
 
-[[bin]]
-name = "dummy"
-path = ".dummy.rs"
-
-[dependencies]
+[dev-dependencies]
 criterion = { version = "0.3.3", features = ["real_blackbox"] }
 rigid = { path = "../rigid" }
 serde = { version = "1.0.117", features = ["derive"] }
@@ -17,5 +13,4 @@ serde_json = "1.0.59"
 
 [[bench]]
 name = "benches"
-path = "benches.rs"
 harness = false
