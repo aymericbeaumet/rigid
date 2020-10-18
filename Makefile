@@ -19,7 +19,7 @@ lint:
 
 .PHONY: test
 test:
-	cargo test --benches
+	cargo test --benches -p benches -p tests
 
 .PHONY: bench
 bench:
