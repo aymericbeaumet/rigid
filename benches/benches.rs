@@ -1,13 +1,41 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{black_box, criterion_group, criterion_main, Criterion, SamplingMode, Throughput};
 
 fn criterion_skip_whitespaces(c: &mut Criterion) {
-    let input = [b' '; 1024];
+    let bytes = [b' '; 1024];
 
-    c.bench_function("skip_whitespaces", |b| {
+    let mut skip_whitespaces = c.benchmark_group("skip_whitespaces");
+    skip_whitespaces
+        .sampling_mode(SamplingMode::Linear) // for faster benchmarks (ps/ns/us/ms scale)
+        .warm_up_time(std::time::Duration::new(5, 0))
+        .measurement_time(std::time::Duration::new(10, 0))
+        .sample_size(1000)
+        .throughput(Throughput::Bytes(bytes.len() as u64));
+
+    skip_whitespaces.bench_function("skip_whitespaces", |b| {
         b.iter(|| {
-            black_box(rigid::runtime::skip_whitespaces(black_box(&input)).unwrap());
+            rigid::runtime::skip_whitespaces(black_box(&bytes)).unwrap();
         })
     });
+
+    skip_whitespaces.bench_function("skip_whitespaces_2", |b| {
+        b.iter(|| {
+            rigid::runtime::skip_whitespaces_2(black_box(&bytes));
+        })
+    });
+
+    skip_whitespaces.bench_function("skip_whitespaces_3", |b| {
+        b.iter(|| {
+            rigid::runtime::skip_whitespaces_3(black_box(&bytes));
+        })
+    });
+
+    skip_whitespaces.bench_function("skip_whitespaces_4", |b| {
+        b.iter(|| {
+            rigid::runtime::skip_whitespaces_4(black_box(&bytes));
+        })
+    });
+
+    skip_whitespaces.finish();
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize, rigid::FromJSON)]

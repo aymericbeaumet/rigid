@@ -30,6 +30,39 @@ pub fn skip_whitespaces(bytes: &[u8]) -> Result<usize> {
 }
 
 #[inline]
+pub fn skip_whitespaces_2(bytes: &[u8]) -> usize {
+    bytes
+        .iter()
+        .take_while(|&&b| b == b' ' || b == 0x0A || b == 0x0D || b == 0x09)
+        .count()
+}
+
+#[inline]
+pub fn skip_whitespaces_3(bytes: &[u8]) -> usize {
+    bytes
+        .iter()
+        .take_while(|b| match b {
+            b' ' => true,
+            0x0A => true,
+            0x0D => true,
+            0x09 => true,
+            _ => false,
+        })
+        .count()
+}
+
+#[inline]
+pub fn skip_whitespaces_4(bytes: &[u8]) -> usize {
+    bytes
+        .iter()
+        .take_while(|b| match b {
+            b' ' | 0x0A | 0x0D | 0x09 => true,
+            _ => false,
+        })
+        .count()
+}
+
+#[inline]
 pub fn eat_char(bytes: &[u8], c: u8) -> Result<usize> {
     if !bytes.is_empty() && bytes[0] == c {
         Ok(1)

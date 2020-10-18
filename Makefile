@@ -23,8 +23,11 @@ test:
 
 .PHONY: bench
 bench:
-	@rm -rf benches/target/criterion
 	cargo bench --bench benches
+
+.PHONY: bench-high-cpu
+bench-high-cpu:
+	sudo nice -n -20 make bench
 
 .PHONY: clean
 clean:
