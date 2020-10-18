@@ -12,11 +12,7 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
                 let bytes = s.as_bytes();
                 let mut idx = 0;
 
-                idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
-
                 #(#steps)*
-
-                idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
 
                 if idx == s.len() {
                     Ok(ret)
@@ -37,8 +33,12 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
 
     let mut steps = vec![];
 
-    // Parse into tuple struct with one field
+    // Make sure we consume all leading whitespaces
+    steps.push(quote::quote! {
+        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
+    });
 
+    // Deserialize into a tuple struct (only when it has a single field)
     if fields.len() == 1 && fields[0].ident.is_none() {
         let eat_fn = get_eat_fn(&fields[0].ty);
 
@@ -48,13 +48,9 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
 
             let ret = #typename(out);
         });
-
-        return steps;
     }
-
-    // Parse into struct
-
-    {
+    // Deserialize into a struct
+    else {
         let mut ret_fields = vec![];
 
         steps.push(quote::quote! {
@@ -105,9 +101,14 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
                 #(#ret_fields),*
             };
         });
+    };
 
-        steps
-    }
+    // Make sure we consume all trailing whitespaces
+    steps.push(quote::quote! {
+        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
+    });
+
+    steps
 }
 
 fn get_eat_fn(ty: &syn::Type) -> syn::Ident {
