@@ -1,5 +1,15 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
+fn criterion_skip_whitespaces(c: &mut Criterion) {
+    let input = [b' '; 1024];
+
+    c.bench_function("skip_whitespaces", |b| {
+        b.iter(|| {
+            black_box(rigid::runtime::skip_whitespaces(black_box(&input)).unwrap());
+        })
+    });
+}
+
 #[derive(Debug, PartialEq, serde::Deserialize, rigid::FromJSON)]
 struct StringOnly(String);
 
@@ -177,6 +187,7 @@ fn criterion_person(c: &mut Criterion) {
 
 criterion_group!(
     benches,
+    criterion_skip_whitespaces,
     criterion_struct_one_field_tuple,
     criterion_struct_empty_many_spaces,
     criterion_struct_bool,
