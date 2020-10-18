@@ -5,10 +5,6 @@ authors = ["Aymeric Beaumet <hi@aymericbeaumet.com>"]
 edition = "2018"
 publish = false
 
-[lib]
-name = "tests"
-path = "tests.rs"
-
 [dependencies]
 rigid = { path = "../rigid" }
 serde = { version = "1.0.117", features = ["derive"] }
