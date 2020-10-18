@@ -1,23 +1,4 @@
-#[derive(Debug)]
-pub struct Error {
-    message: String,
-    remaining: String,
-}
-
-impl Error {
-    pub fn new<T: Into<String>>(m: T, r: &[u8]) -> Self {
-        Self {
-            message: m.into(),
-            remaining: std::str::from_utf8(r).unwrap().into(),
-        }
-    }
-}
-
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} at position `{}`", self.message, self.remaining)
-    }
-}
+pub type Error = ();
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -35,13 +16,7 @@ pub fn eat_char(bytes: &[u8], c: u8) -> Result<usize> {
     if !bytes.is_empty() && bytes[0] == c {
         Ok(1)
     } else {
-        Err(Error::new(
-            format!(
-                "eat_char expected {} ({}) but found {} ({})",
-                c, c as char, bytes[0], bytes[0] as char
-            ),
-            bytes,
-        ))
+        Err(())
     }
 }
 
@@ -56,7 +31,7 @@ pub fn eat_u8(bytes: &[u8]) -> Result<(usize, u8)> {
     if idx > 0 {
         Ok((idx, out))
     } else {
-        Err(Error::new("eat_number couldn't find any digit", bytes))
+        Err(())
     }
 }
 
@@ -71,7 +46,7 @@ pub fn eat_u16(bytes: &[u8]) -> Result<(usize, u16)> {
     if idx > 0 {
         Ok((idx, out))
     } else {
-        Err(Error::new("eat_number couldn't find any digit", bytes))
+        Err(())
     }
 }
 
@@ -110,7 +85,7 @@ pub fn eat_bool(bytes: &[u8]) -> Result<(usize, bool)> {
         }
     }
 
-    Err(Error::new("eat_bool cannot find a boolean", bytes))
+    Err(())
 }
 
 #[inline]
@@ -118,13 +93,7 @@ pub fn eat_u8_slice(bytes: &[u8], s: &[u8]) -> Result<usize> {
     if bytes.starts_with(s) {
         Ok(s.len())
     } else {
-        Err(Error::new(
-            format!(
-                "eat_u8_slice could not match {:?} as a prefix of {:?}",
-                s, bytes
-            ),
-            bytes,
-        ))
+        Err(())
     }
 }
 
@@ -137,10 +106,7 @@ pub fn eat_u8_slice_until_char(bytes: &[u8], c: u8) -> Result<(usize, &[u8])> {
     if idx > 0 {
         Ok((idx, &bytes[0..idx]))
     } else {
-        Err(Error::new(
-            format!("eat_until_char could not find {:?}", c),
-            &bytes[idx..],
-        ))
+        Err(())
     }
 }
 

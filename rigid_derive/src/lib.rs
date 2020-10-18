@@ -21,10 +21,7 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
                 if idx == s.len() {
                     Ok(ret)
                 } else {
-                    Err(::rigid::Error::new(
-                        "from_json_str found trailing characters that cannot be parsed",
-                        &bytes[idx..],
-                    ))
+                    Err(())
                 }
             }
         }
