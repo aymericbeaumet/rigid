@@ -12,7 +12,7 @@ pub fn skip_whitespaces(bytes: &[u8]) -> usize {
 }
 
 #[inline]
-pub fn eat_char(bytes: &[u8], c: u8) -> Result<usize> {
+pub const fn eat_char(bytes: &[u8], c: u8) -> Result<usize> {
     if !bytes.is_empty() && bytes[0] == c {
         Ok(1)
     } else {
@@ -21,7 +21,7 @@ pub fn eat_char(bytes: &[u8], c: u8) -> Result<usize> {
 }
 
 #[inline]
-pub fn eat_u8(bytes: &[u8]) -> Result<(usize, u8)> {
+pub const fn eat_u8(bytes: &[u8]) -> Result<(usize, u8)> {
     let mut idx = 0;
     let mut out = 0;
     while idx < bytes.len() && bytes[idx] >= b'0' && bytes[idx] <= b'9' {
@@ -66,7 +66,7 @@ pub fn eat_string(bytes: &[u8]) -> Result<(usize, String)> {
 }
 
 #[inline]
-pub fn eat_bool(bytes: &[u8]) -> Result<(usize, bool)> {
+pub const fn eat_bool(bytes: &[u8]) -> Result<(usize, bool)> {
     let len = bytes.len();
 
     if len >= 4 {
