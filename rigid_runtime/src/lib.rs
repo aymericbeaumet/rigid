@@ -22,43 +22,11 @@ impl std::fmt::Display for Error {
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[inline]
-pub fn skip_whitespaces(bytes: &[u8]) -> Result<usize> {
-    Ok(bytes
-        .iter()
-        .take_while(|&&b| b == b' ' || b == 0x0A || b == 0x0D || b == 0x09)
-        .count())
-}
-
-#[inline]
-pub fn skip_whitespaces_2(bytes: &[u8]) -> usize {
+#[must_use]
+pub fn skip_whitespaces(bytes: &[u8]) -> usize {
     bytes
         .iter()
-        .take_while(|&&b| b == b' ' || b == 0x0A || b == 0x0D || b == 0x09)
-        .count()
-}
-
-#[inline]
-pub fn skip_whitespaces_3(bytes: &[u8]) -> usize {
-    bytes
-        .iter()
-        .take_while(|b| match b {
-            b' ' => true,
-            0x0A => true,
-            0x0D => true,
-            0x09 => true,
-            _ => false,
-        })
-        .count()
-}
-
-#[inline]
-pub fn skip_whitespaces_4(bytes: &[u8]) -> usize {
-    bytes
-        .iter()
-        .take_while(|b| match b {
-            b' ' | 0x0A | 0x0D | 0x09 => true,
-            _ => false,
-        })
+        .take_while(|b| matches!(b, b' ' | 0x0A | 0x0D | 0x09))
         .count()
 }
 
@@ -110,14 +78,14 @@ pub fn eat_u16(bytes: &[u8]) -> Result<(usize, u16)> {
 #[inline]
 pub fn eat_string(bytes: &[u8]) -> Result<(usize, String)> {
     let mut idx = 0;
-    idx += skip_whitespaces(&bytes[idx..])?;
+    idx += skip_whitespaces(&bytes[idx..]);
     idx += eat_char(&bytes[idx..], b'"')?;
 
     let (delta, found) = eat_u8_slice_until_char(&bytes[idx..], b'"')?;
     idx += delta;
 
     idx += eat_char(&bytes[idx..], b'"')?;
-    idx += skip_whitespaces(&bytes[idx..])?;
+    idx += skip_whitespaces(&bytes[idx..]);
 
     Ok((idx, std::str::from_utf8(found).unwrap().to_string()))
 }
@@ -125,7 +93,7 @@ pub fn eat_string(bytes: &[u8]) -> Result<(usize, String)> {
 #[inline]
 pub fn eat_bool(bytes: &[u8]) -> Result<(usize, bool)> {
     let mut idx = 0;
-    idx += skip_whitespaces(&bytes[idx..])?;
+    idx += skip_whitespaces(&bytes[idx..]);
 
     let (delta, out) = if bytes.starts_with(&[b't', b'r', b'u', b'e']) {
         (4, true)
@@ -136,7 +104,7 @@ pub fn eat_bool(bytes: &[u8]) -> Result<(usize, bool)> {
     };
     idx += delta;
 
-    idx += skip_whitespaces(&bytes[idx..])?;
+    idx += skip_whitespaces(&bytes[idx..]);
     Ok((idx, out))
 }
 

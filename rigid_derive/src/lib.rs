@@ -4,7 +4,7 @@ use proc_macro::TokenStream;
 pub fn derive_from_json(input: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(input as syn::DeriveInput);
     let typename = &input.ident;
-    let steps = get_steps(&input, &typename);
+    let steps = get_steps(&input, typename);
 
     TokenStream::from(quote::quote! {
         impl #typename {
@@ -12,11 +12,11 @@ pub fn derive_from_json(input: TokenStream) -> TokenStream {
                 let bytes = s.as_bytes();
                 let mut idx = 0;
 
-                idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+                idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
 
                 #(#steps)*
 
-                idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+                idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
 
                 if idx == s.len() {
                     Ok(ret)
@@ -62,7 +62,7 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
 
         steps.push(quote::quote! {
             idx += ::rigid::runtime::eat_char(&bytes[idx..], b'{')?;
-            idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+            idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
         });
 
         for (i, field) in fields.iter().enumerate() {
@@ -72,16 +72,16 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
                     let ident_string = ident.to_string();
 
                     steps.push(quote::quote! {
-                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
                         idx += ::rigid::runtime::eat_object_key(&bytes[idx..], #ident_string.as_bytes())?;
-                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
                         idx += ::rigid::runtime::eat_char(&bytes[idx..], b':')?;
-                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
 
                         let (delta, #ident) = ::rigid::runtime::#eat_fn(&bytes[idx..])?;
                         idx += delta;
 
-                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+                        idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
                     });
 
                     ret_fields.push(quote::quote! {
@@ -91,7 +91,7 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
                     if i < fields.len() - 1 {
                         steps.push(quote::quote! {
                             idx += ::rigid::runtime::eat_char(&bytes[idx..], b',')?;
-                            idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..])?;
+                            idx += ::rigid::runtime::skip_whitespaces(&bytes[idx..]);
                         });
                     }
                 }
@@ -109,7 +109,7 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Vec<syn::export
             };
         });
 
-        return steps;
+        steps
     }
 }
 

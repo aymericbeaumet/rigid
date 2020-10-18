@@ -13,25 +13,7 @@ fn criterion_skip_whitespaces(c: &mut Criterion) {
 
     skip_whitespaces.bench_function("skip_whitespaces", |b| {
         b.iter(|| {
-            rigid::runtime::skip_whitespaces(black_box(&bytes)).unwrap();
-        })
-    });
-
-    skip_whitespaces.bench_function("skip_whitespaces_2", |b| {
-        b.iter(|| {
-            rigid::runtime::skip_whitespaces_2(black_box(&bytes));
-        })
-    });
-
-    skip_whitespaces.bench_function("skip_whitespaces_3", |b| {
-        b.iter(|| {
-            rigid::runtime::skip_whitespaces_3(black_box(&bytes));
-        })
-    });
-
-    skip_whitespaces.bench_function("skip_whitespaces_4", |b| {
-        b.iter(|| {
-            rigid::runtime::skip_whitespaces_4(black_box(&bytes));
+            black_box(rigid::runtime::skip_whitespaces(black_box(&bytes)));
         })
     });
 
