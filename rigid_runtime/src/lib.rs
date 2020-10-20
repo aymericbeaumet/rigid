@@ -53,14 +53,12 @@ pub fn eat_u16(bytes: &[u8]) -> Result<(usize, u16)> {
 #[inline]
 pub fn eat_string(bytes: &[u8]) -> Result<(usize, String)> {
     let mut idx = 0;
-    idx += skip_whitespaces(&bytes[idx..]);
     idx += eat_char(&bytes[idx..], b'"')?;
 
     let (delta, found) = eat_u8_slice_until_char(&bytes[idx..], b'"')?;
     idx += delta;
 
     idx += eat_char(&bytes[idx..], b'"')?;
-    idx += skip_whitespaces(&bytes[idx..]);
 
     Ok((idx, std::str::from_utf8(found).unwrap().to_string()))
 }

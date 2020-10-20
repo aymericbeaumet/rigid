@@ -26,6 +26,15 @@ impl Steps {
     fn push(&mut self, step: Step) {
         self.0.push(step)
     }
+
+    fn dedup(mut self) -> Self {
+        self.0.dedup_by(|a, b| match (a, b) {
+            (Step::SkipWhitespaces, Step::SkipWhitespaces) => true,
+            _ => false,
+        });
+
+        self
+    }
 }
 
 impl IntoIterator for Steps {
@@ -41,7 +50,7 @@ impl IntoIterator for Steps {
 pub fn derive_from_json(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = syn::parse_macro_input!(input as syn::DeriveInput);
     let typename = &input.ident;
-    let steps = get_steps(&input, typename).into_iter();
+    let steps = get_steps(&input, typename).dedup().into_iter();
 
     proc_macro::TokenStream::from(quote::quote! {
         impl #typename {
@@ -119,6 +128,7 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Steps {
                     });
 
                     if i < fields.len() - 1 {
+                        steps.push(Step::SkipWhitespaces);
                         steps.push(Step::Quote(quote::quote! {
                                 idx += ::rigid::runtime::eat_char(&bytes[idx..], b',')?;
                         }));
@@ -129,9 +139,11 @@ fn get_steps(input: &syn::DeriveInput, typename: &syn::Ident) -> Steps {
             }
         }
 
+        steps.push(Step::SkipWhitespaces);
         steps.push(Step::Quote(quote::quote! {
             idx += ::rigid::runtime::eat_char(&bytes[idx..], b'}')?;
         }));
+        steps.push(Step::SkipWhitespaces);
 
         steps.push(Step::Quote(quote::quote! {
             let ret = #typename {
